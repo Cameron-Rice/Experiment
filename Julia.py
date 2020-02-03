@@ -14,8 +14,8 @@ BLACK = [0, 0, 0]
 GREY = [10, 10, 10]
 WHITE = [255, 255, 255]
 
-DATA_OUTPUT = "./outputs"
-AUDIO_INPUT = "./audio"
+DATA_OUTPUT = "outputs"
+AUDIO_INPUT = "audio"
 
 # Screen
 screen = pygame.display.set_mode(flags=pygame.FULLSCREEN)
@@ -29,6 +29,8 @@ pygame.mixer.init()
 audio = pygame.mixer.music
 audio_file = ''
 
+# Verify audio path exists, if it does, fetch the audio file.
+# Otherwise, create the directory
 if path.exists(AUDIO_INPUT) and path.isdir(AUDIO_INPUT):
     for _, _, files in os.walk(AUDIO_INPUT):
         if files:
@@ -48,7 +50,7 @@ output_name = ''
 if not (path.exists(DATA_OUTPUT) and path.isdir(DATA_OUTPUT)):
     os.mkdir(DATA_OUTPUT)
 
-output_name = f"{DATA_OUTPUT}/{audio_file[0].split('.')[0] if audio_file else '!NA!'}-{str(datetime.now()).split(' ')[0]}.csv"
+output_name = f"{DATA_OUTPUT}/{path.splitext(audio_file)[0] if audio_file else '!NA!'}-{datetime.now().strftime('%d-%b-%Y_%H.%M.%S')}.csv"
 
 # Mouse cursor
 cur = pygame.mouse
@@ -115,7 +117,7 @@ while True:
             generate_output()  
             sys.exit()
 
-        if event.type == pygame.constants.USEREVENT:
+        elif event.type == pygame.constants.USEREVENT:
             pygame.event.post(pygame.event.Event(pygame.QUIT))
 
         elif event.type == pygame.KEYDOWN:
@@ -152,9 +154,12 @@ while True:
 
     # Draw to scren
     screen.fill(BLACK)
-    draw_grid(50)
-    draw_ref_cross(10)
-    draw_mouse_circle(cur_x, cur_y, 10, filled=True, dist=dist) 
+
+    # Lower grid size = bigger segments. ¯\_(ツ)_/¯
+    draw_grid(size=80)
+
+    draw_ref_cross(size=10)
+    draw_mouse_circle(x=cur_x, y=cur_y, r=10, filled=True, dist=dist)
 
     # Refresh screen
     pygame.display.flip()
